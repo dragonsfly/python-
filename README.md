@@ -1,5 +1,6 @@
-# python-
-面试题
+# python-面试题
+
+
 Python面试题目
 一、Python
 1. python的多进程与多线程的运行机制是什么？有什么区别？分别在什么情况下用？
