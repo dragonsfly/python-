@@ -81,3 +81,65 @@ udp 网络程序-发送数据
 
 7、简单介绍下scrapy的异步处理。
 答：scrapy框架的异步机制是基于twisted异步网络框架处理的，在settings.py文件里可以设置具体的并发量数值（默认是并发量16）。
+
+
+基础概念理解:
+0. 进程间通信-Queue队列
+    	创建 
+    		q = multiprocessing.Queue() 参数表示队列长度 -- 数据条数
+    	往里面放数据
+    		q.put(data)
+    	取出数据
+    		q.get()
+    	判断满
+    		q.full()
+    	判断空
+    		q.empty()
+    	获取队列中的数据数量 mac会崩溃
+    		q.qsize()
+
+    	put(obj[, block[, timeout]])
+    		obj表示数据对象
+    		block表示是否阻塞等待 True表示阻塞等待 False表示不阻塞 不等待
+    		timeout 表示如果等待  等待最长的时间 
+
+            如果超时等待或者 不阻塞等待都没有获取到数据 则抛出异常
+
+        put(data,block=True,timeout=-1)
+
+            put(data,True,10)
+            put(data,False) 不等待 put_nowait(data)
+                如果超时放入 或者 非阻塞放入数据 没有完成任务 都会抛出异常
+
+        get(block=True, timeout=-1])
+            block表示是否阻塞等待 True表示阻塞等待 False表示不阻塞 不等待
+            timeout 表示如果等待  等待最长的时间  -1表示死等
+
+            get() == get(True)
+            get(True,10) 最多超时等待10s 如果没有取到数据 就抛出异常
+            get(False) 不阻塞等待  直接获取数据 如果没有取到数据 就抛出异常
+
+
+1. 进程池
+        
+        创建进程池 pool = Pool(进程的最大数量)
+        添加任务   
+            apply是阻塞的任务添加方式  会等待添加的任务执行完成才会继续往下执行
+            apply_async 是非阻塞的任务添加方式  只管添加  不等任务结束
+
+        关闭进程池
+            .close()
+            pool.terminate()  终止进程池中所有的正在执行的进程任务  
+
+        等待所有任务执行完成 
+            .join()       保持主进程存活 等待所有的工作进程 全部退出
+
+    注意事项:
+        1. 如果需要在进程池中 使用进程间通信Queue 不要使用multiprocessing.Queue() (要求是通过继承的方式创建的进程)
+        应该使用 multiprocessing.Manager().Queue()
+
+        2. .join()之前 一定要调用 .close() 或者.terminate()
+        3. 在正常情况下 是不需要teminate()终止所有工作进程的
+	
+迭代器生成器语法
+	
